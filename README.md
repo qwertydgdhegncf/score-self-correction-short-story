@@ -3,7 +3,6 @@
 **Author:** Siddharth Rao  
 **Assignment:** Individual research short story  
 **Primary paper:** [Training Language Models to Self-Correct via Reinforcement Learning](https://arxiv.org/abs/2409.12917), Kumar et al., 2024, version 2.  
-**Topic approval:** The student confirmed that the instructor approved this paper. It is a 2024 research paper, not a recent survey. Two related surveys provide the broader taxonomy.
 
 SCoRe trains a language model to revise its answers through two-stage, multi-turn reinforcement learning. This review explains the approach and asks how to measure both repaired mistakes and damage to initially correct answers. It connects the paper to survey taxonomies, Self-Refine, Reflexion, Pair-SFT, and STaR-style repair.
 
