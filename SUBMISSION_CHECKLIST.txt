@@ -10,13 +10,18 @@ Created:
 [x] README, original visual assets, benchmark data, calculation script
 
 External completion still requires verified live destinations:
-[ ] Public GitHub repository, anonymously accessible
-[ ] Medium article published
-[ ] SlideShare deck published
-[ ] YouTube video published and accessible
+[x] Public GitHub repository, anonymously accessible
+[x] Medium article published
+[ ] SlideShare deck published: BLOCKED, service says uploads temporarily unavailable
+[x] YouTube video published and accessible
 [ ] All published URLs placed in README
 [ ] GitHub URL added to course spreadsheet
 [ ] GitHub URL submitted to course assignment page
 
 Publication and submission must not be marked complete until verified.
 The separate group final-project rubric is outside this individual paper-review package.
+
+Published URLs:
+GitHub: https://github.com/qwertydgdhegncf/score-self-correction-short-story
+Medium: https://medium.com/@siddharthrao522/learning-to-fix-a-wrong-answer-5e54c218e4d1
+YouTube: https://youtu.be/wp7iQxl6VjI

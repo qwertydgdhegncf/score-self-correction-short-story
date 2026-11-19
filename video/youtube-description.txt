@@ -31,3 +31,6 @@ Chapters:
 12:43 What the evidence supports
 13:37 The practical takeaway
 14:21 Sources and research credit
+
+Repository: https://github.com/qwertydgdhegncf/score-self-correction-short-story
+Article: https://medium.com/@siddharthrao522/learning-to-fix-a-wrong-answer-5e54c218e4d1

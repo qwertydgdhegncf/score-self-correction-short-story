@@ -27,14 +27,14 @@ The video includes the presentation slides and a **synthetic male voice**. It is
 
 | Requirement | Status |
 | --- | --- |
-| Public GitHub repository | Publication pending |
-| Published Medium article | Publication pending |
-| Published SlideShare presentation | Publication pending |
-| YouTube video | Publication pending |
+| Public GitHub repository | [Published and anonymously accessible](https://github.com/qwertydgdhegncf/score-self-correction-short-story) |
+| Published Medium article | [Learning to Fix a Wrong Answer](https://medium.com/@siddharthrao522/learning-to-fix-a-wrong-answer-5e54c218e4d1) |
+| Published SlideShare presentation | Blocked: [SlideShare upload page](https://www.slideshare.net/upload) states “Uploads are temporarily unavailable” and disables uploads. PPTX and PDF are available above. |
+| YouTube video | [Published video](https://youtu.be/wp7iQxl6VjI) |
 | GitHub URL added to course spreadsheet | Awaiting spreadsheet link |
 | GitHub URL submitted to course assignment | Awaiting submission-page link |
 
-Local artifact creation alone does not complete those publication or submission requirements. Verified public links will be added here after publication.
+GitHub, Medium, and YouTube publication are verified. SlideShare is blocked by its disabled upload service as observed on November 18, 2026. The spreadsheet and course submission remain pending their destination links. The local MP4 is exactly 900 seconds; YouTube displays its processed copy as 15:01.
 
 ## What the article and presentation cover
 
