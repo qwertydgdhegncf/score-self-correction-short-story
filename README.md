@@ -29,7 +29,7 @@ The video includes the presentation slides and a **synthetic male voice**. It is
 | --- | --- |
 | Public GitHub repository | [Published and anonymously accessible](https://github.com/qwertydgdhegncf/score-self-correction-short-story) |
 | Published Medium article | [Learning to Fix a Wrong Answer](https://medium.com/@siddharthrao522/learning-to-fix-a-wrong-answer-5e54c218e4d1) |
-| Published SlideShare presentation | Blocked: [SlideShare upload page](https://www.slideshare.net/upload) states “Uploads are temporarily unavailable” and disables uploads. PPTX and PDF are available above. |
+| Presentation delivery | [PPTX supplied instead at the student’s request](slides/score-presentation.pptx). The rubric’s separate SlideShare-link requirement remains unfulfilled because uploads are disabled. |
 | YouTube video | [Published video](https://youtu.be/wp7iQxl6VjI) |
 | GitHub URL added to course spreadsheet | Awaiting spreadsheet link |
 | GitHub URL submitted to course assignment | Awaiting submission-page link |

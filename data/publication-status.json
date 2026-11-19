@@ -6,7 +6,8 @@
     "status": "blocked",
     "reason": "Uploads are temporarily unavailable; upload button disabled",
     "observed_date": "2026-11-18",
-    "url": "https://www.slideshare.net/upload"
+    "url": "https://www.slideshare.net/upload",
+    "student_preference": "Use the delivered PPTX instead of SlideShare"
   },
   "course_spreadsheet": "awaiting destination link",
   "course_submission": "awaiting destination link"
