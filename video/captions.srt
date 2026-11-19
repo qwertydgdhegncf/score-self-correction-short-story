@@ -1,0 +1,659 @@
+1
+00:00:00,000 --> 00:00:00,391
+Welcome.
+
+2
+00:00:00,391 --> 00:00:08,218
+This presentation examines how a language model can learn to improve an answer after it has already committed to one.
+
+3
+00:00:08,218 --> 00:00:15,654
+The central paper is Training Language Models to Self-Correct via Reinforcement Learning, by Aviral Kumar, Vincent Zhuang, and colleagues.
+
+4
+00:00:15,654 --> 00:00:28,960
+I will place its method, called score, in the wider literature on self-correction, explain its architecture, examine the benchmark comparisons and ablations, and discuss what an engineer should measure before using a revision loop.
+
+5
+00:00:28,960 --> 00:00:31,308
+This recording uses synthetic male narration.
+
+6
+00:00:31,308 --> 00:00:34,439
+The research results belong to the cited authors.
+
+7
+00:00:34,439 --> 00:00:39,917
+The diagrams, worked examples, and engineering analysis are explanatory material created for this presentation.
+
+8
+00:00:41,603 --> 00:00:47,776
+Consider a simple equation: three times x plus two, with parentheses around x plus two, equals fifteen.
+
+9
+00:00:47,776 --> 00:00:52,496
+Dividing by three gives x plus two equals five, so x equals three.
+
+10
+00:00:52,496 --> 00:00:53,948
+That answer is correct.
+
+11
+00:00:53,948 --> 00:01:00,847
+Now imagine a revision that expands the left side incorrectly as three x plus two and returns thirteen thirds.
+
+12
+00:01:00,847 --> 00:01:04,841
+The second response may sound careful while damaging a correct result.
+
+13
+00:01:04,841 --> 00:01:09,561
+This is an original teaching example, not an output taken from the paper.
+
+14
+00:01:09,561 --> 00:01:11,740
+It captures the central evaluation problem.
+
+15
+00:01:11,740 --> 00:01:17,550
+We need to measure both the mistakes a model repairs and the correct answers it breaks.
+
+16
+00:01:17,550 --> 00:01:23,359
+A longer explanation, a confident critique, or a changed answer does not by itself establish improvement.
+
+17
+00:01:23,359 --> 00:01:28,443
+The relevant outcome is whether revision increases correctness across the same set of questions.
+
+18
+00:01:30,127 --> 00:01:32,136
+Two surveys provide useful lenses.
+
+19
+00:01:32,136 --> 00:01:39,370
+Pan and colleagues organize correction by timing: during training, during generation, and after an answer has been produced.
+
+20
+00:01:39,370 --> 00:01:46,604
+Kamoi and colleagues emphasize what information supports the feedback and whether evaluation actually tests the intended research question.
+
+21
+00:01:46,604 --> 00:01:49,418
+I combine those lenses into three axes.
+
+22
+00:01:49,418 --> 00:01:51,025
+The first is timing.
+
+23
+00:01:51,025 --> 00:01:59,465
+The second is feedback: the model can criticize itself, receive tool or environment results, or learn from reference-based rewards during training.
+
+24
+00:01:59,465 --> 00:02:06,297
+The third is adaptation: prompts can change, a text memory can grow, or model weights can change.
+
+25
+00:02:06,297 --> 00:02:07,503
+These axes overlap.
+
+26
+00:02:07,503 --> 00:02:13,933
+A post-hoc revision can use external tools, and a trained model can still perform post-hoc revision.
+
+27
+00:02:13,933 --> 00:02:20,363
+Treating the axes separately prevents the word reflection from hiding very different systems and experimental conditions.
+
+28
+00:02:22,047 --> 00:02:28,578
+Self-Refine uses one language model to produce an answer, offer feedback, and revise it without additional training.
+
+29
+00:02:28,578 --> 00:02:35,876
+Reflexion adds a memory mechanism: an agent writes reflections from task feedback and uses those notes in later trials.
+
+30
+00:02:35,876 --> 00:02:40,102
+Its verbal reinforcement does not mean gradient updates to model weights.
+
+31
+00:02:40,102 --> 00:02:45,096
+Pair supervised fine-tuning learns from stored pairs of faulty attempts and repaired answers.
+
+32
+00:02:45,096 --> 00:02:49,706
+A star style repair approach selects successful sampled trajectories for supervised learning.
+
+33
+00:02:49,706 --> 00:02:54,699
+Score instead trains a policy on its own multi-turn trajectories using reinforcement learning.
+
+34
+00:02:54,699 --> 00:02:58,157
+These descriptions explain the mechanisms, not a universal ranking.
+
+35
+00:02:58,157 --> 00:03:08,913
+A tool-using agent with access to execution feedback is solving a different information problem from an intrinsic correction model that receives no new correctness signal at test time.
+
+36
+00:03:08,913 --> 00:03:12,754
+The table makes those assumptions visible before any accuracy comparison.
+
+37
+00:03:14,440 --> 00:03:18,580
+A repair dataset can look successful while teaching the wrong behavior.
+
+38
+00:03:18,580 --> 00:03:20,461
+One issue is distribution mismatch.
+
+39
+00:03:20,461 --> 00:03:26,483
+Suppose an older model produces short arithmetic errors, while a later model produces longer reasoning mistakes.
+
+40
+00:03:26,483 --> 00:03:31,375
+Learning to repair the first distribution does not guarantee competence on the second.
+
+41
+00:03:31,375 --> 00:03:34,385
+Another issue is collapse toward an easy strategy.
+
+42
+00:03:34,385 --> 00:03:41,159
+If a training objective rewards final correctness, a policy may improve its initial answer and then repeat it.
+
+43
+00:03:41,159 --> 00:03:44,546
+That can earn reward without learning much about revision.
+
+44
+00:03:44,546 --> 00:03:51,320
+The engineering analogy is testing a repair service only on archived incidents that no longer resemble production failures.
+
+45
+00:03:51,320 --> 00:03:57,718
+The solution needs exposure to current failures and an objective that distinguishes useful correction from harmless repetition.
+
+46
+00:03:57,718 --> 00:04:05,620
+These are explanations of the failure modes studied in the paper, rather than claims that every supervised repair method must fail.
+
+47
+00:04:07,306 --> 00:04:11,573
+The architecture is a two-attempt interaction with the same trainable policy.
+
+48
+00:04:11,573 --> 00:04:15,840
+A question goes to the model, which generates its first solution.
+
+49
+00:04:15,840 --> 00:04:24,373
+The revision context then includes the original question, the earlier answer, and an instruction asking the model to check for possible error.
+
+50
+00:04:24,373 --> 00:04:29,416
+During training, a verifier scores the responses using known answers or code tests.
+
+51
+00:04:29,416 --> 00:04:31,355
+Those rewards update the policy.
+
+52
+00:04:31,355 --> 00:04:41,053
+During intrinsic self-correction evaluation, the model does not receive the hidden answer, the reward, or test results telling it whether the first attempt was correct.
+
+53
+00:04:41,053 --> 00:04:42,604
+This distinction is essential.
+
+54
+00:04:42,604 --> 00:04:45,320
+Self-generated trajectories do not mean supervision-free learning.
+
+55
+00:04:45,320 --> 00:04:51,526
+The trajectories come from the model, while their training rewards still depend on verifiable task outcomes.
+
+56
+00:04:51,526 --> 00:04:58,508
+The conceptual diagram separates that training-only scoring path from the inference path so the information boundary remains explicit.
+
+57
+00:05:00,194 --> 00:05:01,764
+Score uses two stages.
+
+58
+00:05:01,764 --> 00:05:11,189
+Stage one prepares an initialization that improves the second attempt while keeping the first-attempt distribution near the reference model through a stronger divergence constraint.
+
+59
+00:05:11,189 --> 00:05:17,865
+The idea is to practice useful revision before the first attempt can absorb all the training progress.
+
+60
+00:05:17,865 --> 00:05:23,363
+Stage two trains both attempts and adds a progress bonus to the second-turn reward.
+
+61
+00:05:23,363 --> 00:05:28,075
+The bonus is alpha times the difference between second and first rewards.
+
+62
+00:05:28,075 --> 00:05:37,107
+With binary correctness and an illustrative alpha of ten, changing a wrong answer to a correct one contributes a bonus of positive ten.
+
+63
+00:05:37,107 --> 00:05:39,856
+Breaking a correct answer contributes negative ten.
+
+64
+00:05:39,856 --> 00:05:41,820
+Unchanged correctness contributes zero bonus.
+
+65
+00:05:41,820 --> 00:05:45,354
+These are bonus values, not the complete training objective.
+
+66
+00:05:45,354 --> 00:05:49,281
+The full method also includes correctness rewards and divergence regularization.
+
+67
+00:05:49,281 --> 00:05:52,815
+This design makes recovery and preservation explicit training incentives.
+
+68
+00:05:54,500 --> 00:06:00,872
+For mathematics, the authors fine-tune Gemini one point five Flash and evaluate on five hundred MATH problems.
+
+69
+00:06:00,872 --> 00:06:07,620
+The training construction incorporates forty-five hundred problems from the original MATH test set, leaving five hundred for evaluation.
+
+70
+00:06:07,620 --> 00:06:12,493
+This split should be disclosed whenever these results are compared with other reports.
+
+71
+00:06:12,493 --> 00:06:18,491
+For code, the authors fine-tune Gemini one point zero Pro on MBPP and evaluate on HumanEval.
+
+72
+00:06:18,491 --> 00:06:20,741
+The main comparisons use greedy decoding.
+
+73
+00:06:20,741 --> 00:06:24,489
+The model does not see HumanEval test cases during evaluation.
+
+74
+00:06:24,489 --> 00:06:30,487
+This is a paper review: I have not retrained those proprietary models or rerun their benchmarks.
+
+75
+00:06:30,487 --> 00:06:37,235
+The results shown next are transcribed from the paper, with source tables recorded in the accompanying data files.
+
+76
+00:06:37,235 --> 00:06:43,983
+A reproducible analysis of published numbers is useful, but it should never be described as an independent replication.
+
+77
+00:06:45,667 --> 00:06:53,575
+The mathematics comparison shows why we need to keep three quantities separate: first-attempt accuracy, second-attempt accuracy, and the change within each method.
+
+78
+00:06:53,575 --> 00:07:01,482
+The base model moves from fifty-two point six percent to forty-one point four percent, a decline of eleven point two percentage points.
+
+79
+00:07:01,482 --> 00:07:07,592
+Score moves from sixty percent to sixty-four point four percent, a gain of four point four points.
+
+80
+00:07:07,592 --> 00:07:12,624
+Subtracting those gains gives an improvement of fifteen point six points in self-correction delta.
+
+81
+00:07:12,624 --> 00:07:16,577
+The gap in final accuracy is a different number: twenty-three points.
+
+82
+00:07:16,577 --> 00:07:20,890
+Pair supervised fine-tuning reaches fifty-four point two percent on its second attempt.
+
+83
+00:07:20,890 --> 00:07:25,922
+These rows form a comparison table from this paper, not a current global leaderboard.
+
+84
+00:07:25,922 --> 00:07:28,798
+They support a claim about the tested setup.
+
+85
+00:07:28,798 --> 00:07:34,548
+They do not establish that the same ordering holds for every model, domain, or compute budget.
+
+86
+00:07:36,233 --> 00:07:38,893
+The code results add an important qualification.
+
+87
+00:07:38,893 --> 00:07:44,592
+Score begins at fifty-two point four percent and reaches sixty-four point six percent after revision.
+
+88
+00:07:44,592 --> 00:07:49,531
+Its twelve point two point within-model gain exceeds the base model's three-point gain.
+
+89
+00:07:49,531 --> 00:07:54,470
+But score's initial accuracy is below the base model's fifty-three point seven percent.
+
+90
+00:07:54,470 --> 00:07:58,269
+Training for revision therefore does not automatically improve every measure.
+
+91
+00:07:58,269 --> 00:08:04,348
+Pair supervised fine-tuning has a stronger initial score in this table, then loses accuracy after revision.
+
+92
+00:08:04,348 --> 00:08:12,706
+An engineer should ask which operating point matters: one attempt under tight latency, or a trained two-attempt workflow with additional generation cost.
+
+93
+00:08:12,706 --> 00:08:15,366
+Comparing only final accuracy hides that choice.
+
+94
+00:08:15,366 --> 00:08:26,384
+I also avoid combining the HumanEval numbers with unrelated headline scores from other papers, because different base models, feedback access, and retry budgets would make that combined ranking misleading.
+
+95
+00:08:28,068 --> 00:08:32,276
+We can unpack the score mathematics row using the five-hundred-question denominator.
+
+96
+00:08:32,276 --> 00:08:38,015
+Sixty percent initial accuracy means three hundred answers begin correct and two hundred begin wrong.
+
+97
+00:08:38,015 --> 00:08:43,371
+The reported recovery share of five point eight percent corresponds to twenty-nine repaired problems.
+
+98
+00:08:43,371 --> 00:08:48,345
+The damage share of one point four percent corresponds to seven broken answers.
+
+99
+00:08:48,345 --> 00:08:53,318
+The result is twenty-two additional correct answers, or four point four percentage points.
+
+100
+00:08:53,318 --> 00:08:55,231
+Conditional rates answer different questions.
+
+101
+00:08:55,231 --> 00:09:00,588
+Twenty-nine repairs out of two hundred initially wrong answers gives fourteen point five percent.
+
+102
+00:09:00,588 --> 00:09:06,327
+Seven damages out of three hundred initially correct answers gives about two point three percent.
+
+103
+00:09:06,327 --> 00:09:13,596
+The one point four percent in the table is a share of all problems, not the conditional damage rate.
+
+104
+00:09:13,596 --> 00:09:17,422
+Recording denominators avoids a common error in discussing self-correction results.
+
+105
+00:09:19,106 --> 00:09:24,207
+The ablation study removes components to test what they contribute in this setting.
+
+106
+00:09:24,207 --> 00:09:27,738
+Full score gains four point four points between attempts.
+
+107
+00:09:27,738 --> 00:09:34,407
+Removing multi-turn training changes that to a decline of two point four points, despite stronger first-attempt accuracy.
+
+108
+00:09:34,407 --> 00:09:38,331
+Removing stage one leaves a two point two point gain.
+
+109
+00:09:38,331 --> 00:09:41,469
+Removing reward shaping leaves two point six points.
+
+110
+00:09:41,469 --> 00:09:47,354
+Replacing second-stage reinforcement learning with star leaves two point two points and lowers final accuracy.
+
+111
+00:09:47,354 --> 00:09:52,847
+These comparisons support the combination of multi-turn training, initialization, and reward shaping used here.
+
+112
+00:09:52,847 --> 00:09:56,378
+They do not prove each component is universally necessary.
+
+113
+00:09:56,378 --> 00:10:00,694
+The table also does not provide uncertainty intervals for these rows.
+
+114
+00:10:00,694 --> 00:10:07,363
+I would want repeated seeds and paired uncertainty estimates before treating small differences as stable deployment advantages.
+
+115
+00:10:09,049 --> 00:10:13,278
+A revision consumes computation that could have funded another independent sample.
+
+116
+00:10:13,278 --> 00:10:15,969
+That makes the baseline an engineering decision.
+
+117
+00:10:15,969 --> 00:10:20,968
+A useful study compares revision with repeated sampling or self-consistency under matched resources.
+
+118
+00:10:20,968 --> 00:10:24,428
+The paper explores combining parallel sampling and sequential correction.
+
+119
+00:10:24,428 --> 00:10:31,348
+However, a fixed number of solutions does not automatically guarantee equal token cost, wall-clock latency, or service expense.
+
+120
+00:10:31,348 --> 00:10:39,038
+My proposed deployment evaluation would record every generated critique and revised answer, any verifier calls, and the final selection step.
+
+121
+00:10:39,038 --> 00:10:44,036
+It would use the same questions and a predefined stopping rule across alternatives.
+
+122
+00:10:44,036 --> 00:10:49,803
+Accuracy per dollar and accuracy at a latency target can change which design is preferable.
+
+123
+00:10:49,803 --> 00:10:59,414
+A method that wins when allowed two full generations may be less attractive for a user who needs a reliable answer in one short interaction.
+
+124
+00:11:01,098 --> 00:11:03,048
+Here is another original example.
+
+125
+00:11:03,048 --> 00:11:07,339
+The question asks for the mean of ten, twenty, and sixty.
+
+126
+00:11:07,339 --> 00:11:09,289
+A first attempt gives twenty-five.
+
+127
+00:11:09,289 --> 00:11:16,311
+A useful revision identifies the relevant operation, computes the sum as ninety, counts three observations, and returns thirty.
+
+128
+00:11:16,311 --> 00:11:24,112
+The important feature is a check tied to a specific failure, rather than generic reassurance that the answer was reconsidered.
+
+129
+00:11:24,112 --> 00:11:30,743
+If the application permits a calculator or code execution, that tool can supply an independent arithmetic check.
+
+130
+00:11:30,743 --> 00:11:36,594
+If it does not, the model must rely on its learned behavior and existing context.
+
+131
+00:11:36,594 --> 00:11:38,544
+These are different evaluation settings.
+
+132
+00:11:38,544 --> 00:11:40,884
+This example is deliberately labeled illustrative.
+
+133
+00:11:40,884 --> 00:11:49,076
+It demonstrates what a successful correction would look like, but it is not evidence about score's performance on real unseen questions.
+
+134
+00:11:50,761 --> 00:11:57,102
+My proposed LLM operations workflow starts with a versioned evaluation set and a clear information boundary.
+
+135
+00:11:57,102 --> 00:12:05,029
+Each run records the model version, prompt version, verifier version, first answer, revised answer, correctness transition, token use, and latency.
+
+136
+00:12:05,029 --> 00:12:10,974
+A dashboard should show final accuracy alongside recovery and damage, broken down by task family.
+
+137
+00:12:10,974 --> 00:12:16,918
+Before a release, compare the revision policy against a no-revision baseline and an independent-sampling baseline.
+
+138
+00:12:16,918 --> 00:12:21,278
+Use paired analysis because the same questions appear in each condition.
+
+139
+00:12:21,278 --> 00:12:24,845
+Keep evaluation questions separate from tuning and release decisions.
+
+140
+00:12:24,845 --> 00:12:31,582
+If code execution is used, sandbox it and log failures without exposing hidden tests to the model.
+
+141
+00:12:31,582 --> 00:12:36,734
+This is an engineering proposal, not a deployed system included in the paper.
+
+142
+00:12:36,734 --> 00:12:41,490
+Its purpose is to turn a research insight into measurable operational behavior.
+
+143
+00:12:43,176 --> 00:12:47,694
+The strongest aspect of this work is its evaluation of transitions.
+
+144
+00:12:47,694 --> 00:12:52,624
+It asks whether a policy both fixes mistakes and protects correct answers.
+
+145
+00:12:52,624 --> 00:12:56,731
+The ablations also connect observed behavior to specific training choices.
+
+146
+00:12:56,731 --> 00:12:58,785
+My main reservation is scope.
+
+147
+00:12:58,785 --> 00:13:02,893
+Binary rewards for mathematics and code provide relatively clean signals.
+
+148
+00:13:02,893 --> 00:13:09,054
+An open-ended explanation can be partly correct, unsupported, outdated, or stylistically strong while still misleading.
+
+149
+00:13:09,054 --> 00:13:11,930
+That makes verification and reward design harder.
+
+150
+00:13:11,930 --> 00:13:18,091
+The experiments train over two attempts, so a longer autonomous loop introduces additional distribution changes.
+
+151
+00:13:18,091 --> 00:13:23,021
+Proprietary base models also limit straightforward replication of the full training setup.
+
+152
+00:13:23,021 --> 00:13:35,755
+I would treat score as evidence that a useful revision strategy can be learned under these conditions, then require application-specific evidence before relying on it for broader factual reliability or safety.
+
+153
+00:13:37,439 --> 00:13:42,437
+The practical takeaway is to treat revision as a behavior with measurable benefits and costs.
+
+154
+00:13:42,437 --> 00:13:47,434
+The survey taxonomy helps identify when correction happens, which feedback is available, and what adapts.
+
+155
+00:13:47,434 --> 00:13:56,097
+The score study shows a concrete training design for intrinsic two-attempt correction and demonstrates why a strong initial answer alone does not settle whether revision helps.
+
+156
+00:13:56,097 --> 00:14:05,426
+For a real application, I would begin with the simplest permitted baseline, measure recovery and damage, and add revision only when the benefit survives a fair cost comparison.
+
+157
+00:14:05,426 --> 00:14:10,091
+I would also preserve the first answer in logs so that regressions remain visible.
+
+158
+00:14:10,091 --> 00:14:20,086
+The central question is specific: on this workload, with this model and this budget, does another attempt produce enough additional correctness to justify the delay and the risk of damage?
+
+159
+00:14:21,772 --> 00:14:31,230
+The accompanying article and repository contain the complete bibliography, clickable source links, benchmark data, original figures, presentation slides, and this narration transcript.
+
+160
+00:14:31,230 --> 00:14:37,678
+The main source is Kumar and colleagues' score paper, version two from October twenty twenty-four.
+
+161
+00:14:37,678 --> 00:14:44,127
+The surveys by Kamoi and colleagues and Pan and colleagues supply the broader conceptual context.
+
+162
+00:14:44,127 --> 00:14:47,136
+Self-Refine and Reflexion provide representative contrasting techniques.
+
+163
+00:14:47,136 --> 00:14:51,435
+All reported benchmark results are credited to the original paper.
+
+164
+00:14:51,435 --> 00:14:56,594
+The accompanying calculation script checks the transcribed deltas and derived transition counts.
+
+165
+00:14:56,594 --> 00:14:58,314
+Thank you for watching.

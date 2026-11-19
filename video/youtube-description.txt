@@ -1,0 +1,33 @@
+Learning to Fix a Wrong Answer: SCoRe and LLM Self-Correction
+
+An individual research short story by Siddharth Rao.
+A review of Training Language Models to Self-Correct via Reinforcement Learning (Kumar et al., 2024), with survey context, architecture, benchmark comparisons, ablations, metrics, and an LLMOps evaluation proposal.
+
+Synthetic male narration. AI assisted the writing and visuals. All research results belong to the cited authors; this is not an independent training replication.
+
+Sources:
+Kumar, A., Zhuang, V., Agarwal, R., et al. (2024). Training Language Models to Self-Correct via Reinforcement Learning. arXiv:2409.12917v2. https://arxiv.org/html/2409.12917v2
+Kamoi, R., Zhang, Y., Zhang, N., Han, J., & Zhang, R. (2024). When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs. TACL 12, 1417-1440. https://aclanthology.org/2024.tacl-1.78/
+Pan, L., Saxon, M., Xu, W., Nathani, D., Wang, X., & Wang, W. Y. (2023). Automatically Correcting Large Language Models: Surveying the landscape of diverse self-correction strategies. arXiv:2308.03188v2. https://arxiv.org/abs/2308.03188v2
+Madaan, A., Tandon, N., Gupta, P., et al. (2023). Self-Refine: Iterative Refinement with Self-Feedback. https://arxiv.org/abs/2303.17651v2
+Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., & Yao, S. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning. https://arxiv.org/abs/2303.11366v4
+
+Chapters:
+00:00 Learning to Fix a Wrong Answer
+00:41 The second answer can be worse
+01:30 A taxonomy of self-correction
+02:22 Representative techniques
+03:14 Why learning from repairs can fail
+04:07 Two attempts, one trainable policy
+05:00 SCoRe’s two training stages
+05:54 Evaluation setup and information boundaries
+06:45 MATH500: comparison within the paper
+07:36 HumanEval: first-attempt and repair ability differ
+08:28 Recovery and damage explain the net gain
+09:19 Ablations connect design choices to outcomes
+10:09 Compute budget changes the comparison
+11:01 A worked example of correction risk
+11:50 An LLMOps evaluation plan
+12:43 What the evidence supports
+13:37 The practical takeaway
+14:21 Sources and research credit

@@ -1,0 +1,22 @@
+INDIVIDUAL SHORT-STORY ASSIGNMENT
+
+Created:
+[x] Instructor-approved primary paper (student confirmation)
+[x] Related survey context and taxonomy
+[x] Newly drafted, illustrated article with citations and original analysis
+[x] 18-slide editable PowerPoint and matching PDF
+[x] 15:00 slides video with synthetic male narration
+[x] Narration transcript and captions
+[x] README, original visual assets, benchmark data, calculation script
+
+External completion still requires verified live destinations:
+[ ] Public GitHub repository, anonymously accessible
+[ ] Medium article published
+[ ] SlideShare deck published
+[ ] YouTube video published and accessible
+[ ] All published URLs placed in README
+[ ] GitHub URL added to course spreadsheet
+[ ] GitHub URL submitted to course assignment page
+
+Publication and submission must not be marked complete until verified.
+The separate group final-project rubric is outside this individual paper-review package.

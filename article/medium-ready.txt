@@ -1,0 +1,105 @@
+Learning to Fix a Wrong Answer
+
+SCoRe, self-correction, and the engineering of a useful second attempt
+
+By Siddharth Rao
+
+A second opinion from the same model
+
+A language model answers a question. You ask it to check its work. It changes the answer. Did the system become more reliable? The change alone tells us almost nothing. A revision can repair an error, preserve a correct answer, repeat a mistake, or damage work that was already right. A useful account of self-correction must distinguish those outcomes.
+
+That is the lens for this short story about SCoRe, the method introduced by Aviral Kumar, Vincent Zhuang, and colleagues in Training Language Models to Self-Correct via Reinforcement Learning. The paper asks how training can make a second attempt useful. This article connects that research to two surveys, explains representative techniques, and offers an engineering interpretation. It reports the authors' experiments rather than a new model-training study. [S1-S3]
+
+Consider an original example: 3(x + 2) = 15. The correct solution is x = 3. A revision that expands the expression as 3x + 2 and returns 13/3 makes the response worse. An explanation can sound more deliberate while becoming less correct. This is why I would evaluate revision through observed correctness transitions, rather than the confidence or length of its prose.
+
+Three axes make the literature easier to navigate
+
+Pan and colleagues survey correction during training, generation, and post-hoc revision. Kamoi and colleagues examine the information used for feedback and the experimental conditions that support claims about correction. Their critical survey warns that prompted feedback alone does not generally establish dependable correction and highlights the role of reliable external feedback and fine-tuning. These are findings about the literature they reviewed, not a prediction that future prompting methods cannot work. [S2-S3]
+
+Combining these lenses produces three useful questions. First, when does correction occur? Second, where does the corrective signal come from? Third, what changes between attempts? Timing, feedback, and adaptation are separate dimensions. A system can revise after generation while using a trained policy. Another can revise at the same point with unchanged weights and a tool result. Calling both systems reflective obscures the difference that an evaluator needs to control.
+
+This matters for agent design. A compiler error supplies evidence about a program. A memory note supplies context from a previous trial. A self-critique supplies another model-generated judgment. None should be silently treated as equivalent to a hidden reference answer. The taxonomy figure is an original synthesis of these dimensions, rather than a reproduction of either survey's diagram.
+
+[Insert original figure: assets/taxonomy.png]
+
+Five techniques, five different learning stories
+
+Self-Refine gives the same language model three jobs: generate, critique, and refine. The method changes the interaction through prompts without additional model training. It is an accessible starting point when a workflow can afford another generation and has an appropriate way to judge the result. Its crucial uncertainty is the quality of the feedback produced by the model itself. [S4]
+
+Reflexion turns feedback into textual experience. An agent writes a reflection and retains it in episodic memory for later trials. Its verbal reinforcement changes the context available to the agent rather than updating model weights. That distinction is useful for applications where retraining is impractical but feedback and persistent memory are available. It also means its evaluation assumptions can differ from intrinsic answer revision. [S5]
+
+Pair-SFT learns from stored faulty-answer and repair pairs. STaR-style repair selects successful sampled traces for supervised training. Both can make the training data look more useful without guaranteeing that the resulting policy handles its own future mistakes. SCoRe instead uses on-policy multi-turn reinforcement learning, so training encounters the evolving policy's trajectories. The relevant question is whether the learned strategy generalizes to new failures. [S1]
+
+My reading is that technique names are less informative than the available evidence and the object that adapts. For a retrieval assistant, better source evidence may matter more than another self-critique. For a coding agent, execution feedback may dominate stylistic reflection. For a weight-training project with clean outcome checks, learning a revision policy becomes a meaningful alternative.
+
+The training loop behind SCoRe
+
+The architecture uses one policy for an initial answer and a revision. During training, known answers or code tests score outcomes. During intrinsic evaluation, the revision instruction does not reveal whether the initial answer is correct. Self-generated trajectories therefore still depend on verifiable rewards during training. [S1, Sections 3 and 6]
+
+Two stages shape the behavior. Stage I improves second attempts while a KL constraint keeps the first-attempt distribution near the base policy. Stage II trains both attempts and adds a second-turn progress bonus, alpha times the change in correctness reward, alongside the ordinary rewards and regularization. This discourages both unproductive repetition and damage to correct answers. [S1, Section 5]
+
+An illustrative binary-reward calculation helps explain the bonus. With alpha = 10, a wrong-to-correct transition contributes +10, a correct-to-wrong transition contributes -10, and unchanged correctness contributes zero. Those are bonus terms, not total rewards. The reward still needs to value a correct answer that stays correct. Otherwise, an objective could accidentally encourage a weak first answer just to create apparent room for improvement.
+
+The diagram separates the training verifier from the inference interaction. That boundary is central to interpreting any correction claim: what the learner uses while updating weights can differ from what the deployed model is allowed to observe. An evaluation that leaks the answer through feedback would test a different capability.
+
+[Insert original figure: assets/architecture.png]
+
+Reading the comparison tables without overselling them
+
+On MATH500, SCoRe moves from 60.0% to 64.4% accuracy, while the base model moves from 52.6% to 41.4%. Its within-policy gain is +4.4 percentage points. The difference between those gains is 15.6 points. The final-accuracy gap is 23.0 points. These quantities answer different questions and should retain their labels. [S1, Table 2]
+
+On HumanEval, SCoRe moves from 52.4% to 64.6%. Its first-attempt score is lower than the base model's 53.7%, a useful reminder that revision training does not improve every operating point. Both tables below describe this paper's comparisons, rather than a current global leaderboard. [S1, Table 3]
+
+The experimental conditions constrain interpretation. Math uses Gemini 1.5 Flash and a 500-problem evaluation split after 4,500 original MATH test problems join training. Code uses Gemini 1.0 Pro, trains on MBPP, and evaluates on HumanEval. Main comparisons use greedy decoding. Those details should accompany comparisons to other reports. [S1, Section 6]
+
+I would read a table horizontally before reading it vertically. Horizontally, compare a policy's first and second attempts to assess revision. Vertically, compare final performance across policies to assess the resulting workflow. A method can win one comparison while losing another. A deployment also pays for token generation, selection, and waiting time, which these accuracy columns do not summarize.
+
+[Insert original figure: assets/math-comparison.png]
+
+[Insert original figure: assets/code-comparison.png]
+
+The metric that makes regressions visible
+
+Let N be the number of problems. Define recovery share as wrong-to-correct transitions divided by N, and damage share as correct-to-wrong transitions divided by N. The change in accuracy equals recovery share minus damage share. Conditional repair instead divides by the initially wrong answers. Conditional damage divides by the initially correct answers. These denominator choices must be explicit.
+
+For the SCoRe MATH row, 500 problems and 60.0% initial accuracy imply 300 initially correct answers. The reported recovery and damage shares imply 29 repairs and 7 regressions. Thus the net improvement is 22/500 = 4.4 percentage points. Conditional repair is 29/200 = 14.5%, while conditional damage is 7/300, approximately 2.3%. These counts and conditional rates are calculations from Table 2, not additional experiments. [S1]
+
+This decomposition suggests an operational habit: preserve both versions of every answer in evaluation logs. A final score alone can conceal a revision policy that fixes one category of error while harming another. For example, arithmetic recovery can coexist with new instruction-following mistakes. Slice-level transition reports make that trade-off visible before users discover it.
+
+[Insert original figure: assets/transitions.png]
+
+What the ablations establish
+
+The MATH ablations give +4.4 points for full SCoRe, -2.4 without multi-turn training, +2.2 without Stage I, +2.6 without reward shaping, and +2.2 when STaR replaces Stage II RL. These comparisons support the combined design in the tested setting. They do not establish universal necessity. [S1, Table 4]
+
+My interpretation is that the most revealing ablation is the one with stronger first-attempt performance and a negative revision delta. It separates solving from repairing. A model can become better at answering immediately while becoming worse at handling its own answer as context. A system built around repeated revision needs evidence for that repeated interaction, not just a strong single-turn benchmark.
+
+I would strengthen the evaluation with multiple training seeds, paired uncertainty estimates, and a predeclared resource budget. Compare revision with independent resampling or self-consistency while counting critique, selection, and verifier costs. The paper explores inference-compute scaling, but an equal count of candidate solutions need not imply equal token cost or latency. [S1, Section 6.2; analysis]
+
+The final-accuracy and delta charts are separate for a reason. A large positive delta can still end at a low final score if the first answer is weak. A high final score can coexist with a useless second turn. Showing both avoids rewarding the wrong behavior.
+
+[Insert original figure: assets/ablation.png]
+
+My engineering view: a revision loop needs a release gate
+
+Before deploying correction, I would version the evaluation set, prompts, model, verifier, and stopping rule. Each record would include both answers, correctness labels, transition type, generated tokens, tool calls, and latency. Release gates would compare final accuracy, damage rate, and cost against no-revision and sampling baselines on the same held-out questions. This is a proposed LLMOps workflow, not a deployment reported by the paper.
+
+I would also separate verifiable tasks from open-ended factual work. Exact-answer math and executable code offer relatively clear outcomes. A factual explanation can mix correct statements, unsupported claims, and missing qualifications. A reliable-looking critique can share the generator's blind spots. Better retrieval, independent checking, or abstention may deserve priority in those settings. The evidence here should not be generalized into a safety guarantee.
+
+The study trains two attempts with proprietary Gemini models. Reproducing that entire training setup is different from checking published tables, and I have not claimed a replication. Longer loops, different model families, broader domains, and noisy verifiers remain meaningful tests of transfer. These limitations make the research question more precise rather than less interesting. [S1, Section 7; analysis]
+
+My central takeaway is to ask whether the second attempt earns its place. Measure repairs and regressions, preserve the information boundary, and compare alternatives under the budget the application actually has. SCoRe supplies a concrete example of training toward a useful revision strategy. The broader lesson is that correction deserves its own objective and its own evaluation.
+
+References
+
+[S1] Kumar, A., Zhuang, V., Agarwal, R., et al. (2024). Training Language Models to Self-Correct via Reinforcement Learning. arXiv:2409.12917v2. https://arxiv.org/html/2409.12917v2
+
+[S2] Kamoi, R., Zhang, Y., Zhang, N., Han, J., & Zhang, R. (2024). When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs. TACL 12, 1417-1440. https://aclanthology.org/2024.tacl-1.78/
+
+[S3] Pan, L., Saxon, M., Xu, W., Nathani, D., Wang, X., & Wang, W. Y. (2023). Automatically Correcting Large Language Models: Surveying the landscape of diverse self-correction strategies. arXiv:2308.03188v2. https://arxiv.org/abs/2308.03188v2
+
+[S4] Madaan, A., Tandon, N., Gupta, P., et al. (2023). Self-Refine: Iterative Refinement with Self-Feedback. https://arxiv.org/abs/2303.17651v2
+
+[S5] Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., & Yao, S. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning. https://arxiv.org/abs/2303.11366v4
+
+Disclosure: AI assisted drafting and visualization. Video narration is synthetic. No independent model-training replication is claimed.

@@ -1,0 +1,6 @@
+method,accuracy_t1_percent,accuracy_t2_percent,delta_percentage_points,source
+Full SCoRe,60.0,64.4,4.4,S1 Table 4
+No multi-turn training,61.8,59.4,-2.4,S1 Table 4
+No Stage I,59.2,61.4,2.2,S1 Table 4
+No reward shaping,60.0,62.6,2.6,S1 Table 4
+STaR replaces Stage II RL,56.2,58.4,2.2,S1 Table 4

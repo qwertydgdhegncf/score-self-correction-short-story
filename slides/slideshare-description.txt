@@ -1,0 +1,6 @@
+Learning to Fix a Wrong Answer: SCoRe and LLM Self-Correction
+
+An individual research short story by Siddharth Rao explaining SCoRe alongside survey taxonomies, Self-Refine, Reflexion, Pair-SFT, and STaR-style repair. Includes architecture, MATH500 and HumanEval comparisons, ablations, recovery and damage metrics, and original LLMOps analysis.
+
+Main source: https://arxiv.org/abs/2409.12917
+AI assisted writing and visualization. All reported benchmark results are credited to their original authors. No independent model-training replication is claimed.

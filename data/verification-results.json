@@ -1,0 +1,23 @@
+{
+  "analysis_type": "Arithmetic verification of published tables, not a model replication",
+  "source": "https://arxiv.org/html/2409.12917v2",
+  "rows_verified": {
+    "math_results": 5,
+    "humaneval_results": 4,
+    "ablation_results": 5
+  },
+  "math500_score": {
+    "n": 500,
+    "initial_correct": 300,
+    "initial_wrong": 200,
+    "repaired": 29,
+    "damaged": 7,
+    "final_correct": 322,
+    "net_gain_percentage_points": 4.3999999999999995,
+    "conditional_repair_percent": 14.499999999999998,
+    "conditional_damage_percent": 2.3333333333333335,
+    "improvement_in_delta_vs_base_percentage_points": 15.6,
+    "final_accuracy_gain_vs_base_percentage_points": 23.000000000000007
+  },
+  "humaneval_rounding_note": "Printed one-decimal accuracies and deltas can differ by 0.1 pp after subtraction; values remain as reported."
+}

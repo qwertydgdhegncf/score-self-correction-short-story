@@ -1,0 +1,27 @@
+[
+  {
+    "id": "S1",
+    "citation": "Kumar, A., Zhuang, V., Agarwal, R., et al. (2024). Training Language Models to Self-Correct via Reinforcement Learning. arXiv:2409.12917v2.",
+    "url": "https://arxiv.org/html/2409.12917v2"
+  },
+  {
+    "id": "S2",
+    "citation": "Kamoi, R., Zhang, Y., Zhang, N., Han, J., & Zhang, R. (2024). When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs. TACL 12, 1417-1440.",
+    "url": "https://aclanthology.org/2024.tacl-1.78/"
+  },
+  {
+    "id": "S3",
+    "citation": "Pan, L., Saxon, M., Xu, W., Nathani, D., Wang, X., & Wang, W. Y. (2023). Automatically Correcting Large Language Models: Surveying the landscape of diverse self-correction strategies. arXiv:2308.03188v2.",
+    "url": "https://arxiv.org/abs/2308.03188v2"
+  },
+  {
+    "id": "S4",
+    "citation": "Madaan, A., Tandon, N., Gupta, P., et al. (2023). Self-Refine: Iterative Refinement with Self-Feedback.",
+    "url": "https://arxiv.org/abs/2303.17651v2"
+  },
+  {
+    "id": "S5",
+    "citation": "Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., & Yao, S. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning.",
+    "url": "https://arxiv.org/abs/2303.11366v4"
+  }
+]

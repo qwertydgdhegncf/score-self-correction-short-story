@@ -1,0 +1,5 @@
+method,accuracy_t1_percent,accuracy_t2_percent,delta_percentage_points,recovery_share_percent,damage_share_percent,source
+Base model,53.7,56.7,3.0,7.9,4.9,S1 Table 3
+Self-Refine,53.7,52.5,-1.2,9.8,11.0,S1 Table 3
+Pair-SFT,56.1,54.3,-1.8,4.3,6.1,S1 Table 3
+SCoRe,52.4,64.6,12.2,15.2,3.0,S1 Table 3
